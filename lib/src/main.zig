@@ -6,29 +6,34 @@ const expect = std.testing.expect;
 const expectEqualStrings = std.testing.expectEqualStrings;
 
 pub fn main() !void {
-    const s = "asd";
-    const str = String.new(s);
+    var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    defer arena.deinit();
+    var allocator = arena.allocator();
 
-    print("{}\n", .{@TypeOf(s[0..s.len].*)});
+    const str = String.new(&allocator, "asd");
+
+    print("{}\n", .{@TypeOf("asd"[0.."asd".len].*)});
     print("str.len: {d}\n", .{str.length});
     print("str.string: {s}\n", .{str.string});
     print("str.capitalize: {s}\n", .{str.capitalize()});
+    print("str.concat: {s}\n", .{str.concat(" xxx")});
+    print("str.len: {d}\n", .{str.length});
 }
 
 test "capitalize" {
-    const s = "hello Zig.";
-    const str = String.new(s);
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    var allocator = arena.allocator();
+
+    const str = String.new(&allocator, "hello Zig.");
     try expectEqualStrings(str.capitalize(), "Hello Zig.");
 
-    const s1 = "a";
-    const str1 = String.new(s1);
+    const str1 = String.new(&allocator, "a");
     try expectEqualStrings(str1.capitalize(), "A");
 
-    const s2 = "A";
-    const str2 = String.new(s2);
+    const str2 = String.new(&allocator, "A");
     try expectEqualStrings(str2.capitalize(), "A");
 
-    const s3 = "";
-    const str3 = String.new(s3);
+    const str3 = String.new(&allocator, "");
     try expectEqualStrings(str3.capitalize(), "");
 }
