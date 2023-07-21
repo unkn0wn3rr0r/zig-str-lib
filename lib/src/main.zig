@@ -10,13 +10,16 @@ pub fn main() !void {
     defer arena.deinit();
     var allocator = arena.allocator();
 
-    const str = String.new(&allocator, "asd");
+    var str = String.new(&allocator, "asd");
 
     print("{}\n", .{@TypeOf("asd"[0.."asd".len].*)});
     print("str.len: {d}\n", .{str.length});
     print("str.string: {s}\n", .{str.string});
     print("str.capitalize: {s}\n", .{str.capitalize()});
     print("str.concat: {s}\n", .{str.concat(" xxx")});
+    print("str.len: {d}\n", .{str.length});
+    print("str.string: {s}\n", .{str.string});
+    print("str.concat: {s}\n", .{str.concat("hello Zig.!!!!!!!!!!! ☆*: .｡. o(≧▽≦)o .｡.:*☆")});
     print("str.len: {d}\n", .{str.length});
 }
 
@@ -36,4 +39,20 @@ test "capitalize" {
 
     const str3 = String.new(&allocator, "");
     try expectEqualStrings(str3.capitalize(), "");
+}
+
+test "concat" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    var allocator = arena.allocator();
+
+    var str = String.new(&allocator, "hello");
+    try expectEqualStrings(str.concat(" Zig."), "hello Zig.");
+    try expect(str.length == 10);
+
+    try expectEqualStrings(str.concat("!!!!!!!!!!!"), "hello Zig.!!!!!!!!!!!");
+    try expect(str.length == 21);
+
+    try expectEqualStrings(str.concat(" ☆*: .｡. o(≧▽≦)o .｡.:*☆"), "hello Zig.!!!!!!!!!!! ☆*: .｡. o(≧▽≦)o .｡.:*☆");
+    try expect(str.length == 58);
 }
