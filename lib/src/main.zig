@@ -60,6 +60,23 @@ test "concat" {
     try expect(str.length == 58);
 }
 
+test "startsWith" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    var allocator = arena.allocator();
+
+    var str = String.new(&allocator, "pesho");
+    try expect(str.startsWith("p"));
+    try expect(str.startsWith("pe"));
+    try expect(str.startsWith("pes"));
+    try expect(str.startsWith("pesh"));
+    try expect(str.startsWith("pesho"));
+    try expect(!str.startsWith("xxx"));
+    try expect(!str.startsWith("peshoo"));
+    try expect(!str.startsWith("pa"));
+    try expect(!str.startsWith("pas"));
+}
+
 test "endsWith" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();

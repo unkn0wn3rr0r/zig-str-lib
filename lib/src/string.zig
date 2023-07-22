@@ -47,6 +47,19 @@ pub const String = struct {
         return newString;
     }
 
+    pub fn startsWith(self: Self, str: []const u8) bool {
+        if (str.len > self.length) {
+            return false;
+        }
+        var i: usize = 0;
+        while (i < str.len) : (i += 1) {
+            if (str[i] != self.string[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     pub fn endsWith(self: Self, str: []const u8) bool {
         if (str.len > self.length) {
             return false;
