@@ -10,20 +10,9 @@ pub fn main() !void {
     defer arena.deinit();
     var allocator = arena.allocator();
 
-    var str = String.new(&allocator, "asd");
+    var str = String.new(&allocator, "debel");
 
-    print("{}\n", .{@TypeOf("asd"[0.."asd".len].*)});
-    print("str.len: {d}\n", .{str.length});
-    print("str.string: {s}\n", .{str.string});
-    print("str.capitalize: {s}\n", .{str.capitalize()});
-    print("str.concat: {s}\n", .{str.concat(" xxx")});
-    print("str.len: {d}\n", .{str.length});
-    print("str.string: {s}\n", .{str.string});
-    print("str.concat: {s}\n", .{str.concat("hello Zig.!!!!!!!!!!! ☆*: .｡. o(≧▽≦)o .｡.:*☆")});
-    print("str.len: {d}\n", .{str.length});
-    print("{s}.endsWith 'sho': {}\n", .{ str.string, str.endsWith("sho") });
-    print("{s}.endsWith 'sd': {}\n", .{ str.string, str.endsWith("sd") });
-    print("{s}.endsWith 'sd': {}\n", .{ str.string, str.endsWith("☆*: .｡. o(≧▽≦)o .｡.:*☆") });
+    print("'{s}' reversed is '{s}'\n", .{ str.string, str.reverse() });
 }
 
 test "capitalize" {
@@ -92,4 +81,19 @@ test "endsWith" {
     try expect(!str.endsWith("peshoo"));
     try expect(!str.endsWith("so"));
     try expect(!str.endsWith("cho"));
+}
+
+test "reverse" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    var allocator = arena.allocator();
+
+    var str = String.new(&allocator, "lebed");
+    try expectEqualStrings(str.reverse(), "debel");
+
+    var str1 = String.new(&allocator, "Hello Zig!");
+    try expectEqualStrings(str1.reverse(), "!giZ olleH");
+
+    var str2 = String.new(&allocator, "zi");
+    try expectEqualStrings(str2.reverse(), "iz");
 }

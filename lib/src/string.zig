@@ -75,6 +75,16 @@ pub const String = struct {
         return true;
     }
 
+    pub fn reverse(self: *Self) []u8 {
+        var reversed: []u8 = self.allocator.alloc(u8, self.length) catch unreachable;
+        var t: usize = 0;
+        while (t < self.length) : (t += 1) {
+            reversed[t] = self.string[self.length - 1 - t];
+        }
+        self.string = reversed;
+        return reversed;
+    }
+
     fn copyConstU8ToU8(allocator: *Allocator, str: []const u8) []u8 {
         var buf: []u8 = allocator.alloc(u8, str.len) catch unreachable;
         for (str, 0..) |_, i| {
