@@ -21,6 +21,9 @@ pub fn main() !void {
     print("str.string: {s}\n", .{str.string});
     print("str.concat: {s}\n", .{str.concat("hello Zig.!!!!!!!!!!! ☆*: .｡. o(≧▽≦)o .｡.:*☆")});
     print("str.len: {d}\n", .{str.length});
+    print("{s}.endsWith 'sho': {}\n", .{ str.string, str.endsWith("sho") });
+    print("{s}.endsWith 'sd': {}\n", .{ str.string, str.endsWith("sd") });
+    print("{s}.endsWith 'sd': {}\n", .{ str.string, str.endsWith("☆*: .｡. o(≧▽≦)o .｡.:*☆") });
 }
 
 test "capitalize" {
@@ -55,4 +58,21 @@ test "concat" {
 
     try expectEqualStrings(str.concat(" ☆*: .｡. o(≧▽≦)o .｡.:*☆"), "hello Zig.!!!!!!!!!!! ☆*: .｡. o(≧▽≦)o .｡.:*☆");
     try expect(str.length == 58);
+}
+
+test "endsWith" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    var allocator = arena.allocator();
+
+    var str = String.new(&allocator, "pesho");
+    try expect(str.endsWith("o"));
+    try expect(str.endsWith("ho"));
+    try expect(str.endsWith("sho"));
+    try expect(str.endsWith("esho"));
+    try expect(str.endsWith("pesho"));
+    try expect(!str.endsWith("xxx"));
+    try expect(!str.endsWith("peshoo"));
+    try expect(!str.endsWith("so"));
+    try expect(!str.endsWith("cho"));
 }

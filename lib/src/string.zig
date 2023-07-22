@@ -47,6 +47,21 @@ pub const String = struct {
         return newString;
     }
 
+    pub fn endsWith(self: Self, str: []const u8) bool {
+        if (str.len > self.length) {
+            return false;
+        }
+        var i: usize = self.string.len - str.len;
+        var t: usize = 0;
+        while (i < self.string.len) : (i += 1) {
+            if (str[t] != self.string[i]) {
+                return false;
+            }
+            t += 1;
+        }
+        return true;
+    }
+
     fn copyConstU8ToU8(allocator: *Allocator, str: []const u8) []u8 {
         var buf: []u8 = allocator.alloc(u8, str.len) catch unreachable;
         for (str, 0..) |_, i| {
