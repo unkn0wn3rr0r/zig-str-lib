@@ -17,7 +17,7 @@ pub const String = struct {
         };
     }
 
-    pub fn capitalize(self: Self) []u8 {
+    pub fn capitalize(self: Self) []const u8 {
         if (self.length < 1) {
             return "";
         }
@@ -75,7 +75,7 @@ pub const String = struct {
         return true;
     }
 
-    pub fn reverse(self: *Self) []u8 {
+    pub fn reverse(self: *Self) []const u8 {
         var reversed: []u8 = self.allocator.alloc(u8, self.length) catch unreachable;
         var i: usize = 0;
         while (i < self.length) : (i += 1) {
@@ -105,6 +105,26 @@ pub const String = struct {
             }
         }
         return false;
+    }
+
+    pub fn toUpperCase(self: *Self) []const u8 {
+        var i: usize = 0;
+        while (i < self.length) : (i += 1) {
+            if (self.string[i] >= 97 and self.string[i] <= 122) {
+                self.string[i] = self.string[i] - 32;
+            }
+        }
+        return self.string;
+    }
+
+    pub fn toLowerCase(self: *Self) []const u8 {
+        var i: usize = 0;
+        while (i < self.length) : (i += 1) {
+            if (self.string[i] >= 65 and self.string[i] <= 90) {
+                self.string[i] = self.string[i] + 32;
+            }
+        }
+        return self.string;
     }
 
     fn copyConstU8ToU8(allocator: *Allocator, str: []const u8) []u8 {

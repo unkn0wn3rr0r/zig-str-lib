@@ -129,3 +129,39 @@ test "includes" {
     try expect(!str2.includes("pesho"));
     try expect(!str2.includes("Hhello"));
 }
+
+test "toUpperCase" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    var allocator = arena.allocator();
+
+    var str = String.new(&allocator, "pepeshope");
+    try expectEqualStrings(str.toUpperCase(), "PEPESHOPE");
+
+    var str1 = String.new(&allocator, "xXxXxX");
+    try expectEqualStrings(str1.toUpperCase(), "XXXXXX");
+
+    var str2 = String.new(&allocator, "XX");
+    try expectEqualStrings(str2.toUpperCase(), "XX");
+
+    var str3 = String.new(&allocator, "a@!?./adfoigioadf0101hOH0");
+    try expectEqualStrings(str3.toUpperCase(), "A@!?./ADFOIGIOADF0101HOH0");
+}
+
+test "toLowerCase" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    var allocator = arena.allocator();
+
+    var str = String.new(&allocator, "PEPESHOPE");
+    try expectEqualStrings(str.toLowerCase(), "pepeshope");
+
+    var str1 = String.new(&allocator, "xXxXxX");
+    try expectEqualStrings(str1.toLowerCase(), "xxxxxx");
+
+    var str2 = String.new(&allocator, "xx");
+    try expectEqualStrings(str2.toLowerCase(), "xx");
+
+    var str3 = String.new(&allocator, "A@!?./ADFOIGIOADF0101HOH0");
+    try expectEqualStrings(str3.toLowerCase(), "a@!?./adfoigioadf0101hoh0");
+}
