@@ -12,7 +12,7 @@ pub fn main() !void {
 
     var str = String.new(&allocator, "debel");
 
-    print("'{s}' reversed is '{s}'\n", .{ str.string, str.reverse() });
+    print("{}\n", .{str.includes("ebe")});
 }
 
 test "capitalize" {
@@ -96,4 +96,36 @@ test "reverse" {
 
     var str2 = String.new(&allocator, "zi");
     try expectEqualStrings(str2.reverse(), "iz");
+}
+
+test "includes" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    var allocator = arena.allocator();
+
+    var str = String.new(&allocator, "pepeshope");
+    try expect(str.includes("pesho"));
+    try expect(str.includes("pe"));
+    try expect(str.includes("ope"));
+    try expect(str.includes("shop"));
+    try expect(!str.includes("opep"));
+
+    var str1 = String.new(&allocator, "Hello Zig!");
+    try expect(str1.includes("!"));
+    try expect(str1.includes("Zig!"));
+    try expect(str1.includes("ig"));
+    try expect(str1.includes("e"));
+    try expect(str1.includes("Hello"));
+    try expect(!str1.includes("pesho"));
+    try expect(!str1.includes("Hhello"));
+
+    var str2 = String.new(&allocator, "x");
+    try expect(str2.includes("x"));
+    try expect(!str2.includes("!"));
+    try expect(!str2.includes("Zig!"));
+    try expect(!str2.includes("ig"));
+    try expect(!str2.includes("e"));
+    try expect(!str2.includes("Hello"));
+    try expect(!str2.includes("pesho"));
+    try expect(!str2.includes("Hhello"));
 }
