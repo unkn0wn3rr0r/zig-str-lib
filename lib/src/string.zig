@@ -127,6 +127,11 @@ pub const String = struct {
         return self.string;
     }
 
+    pub fn clear(self: *Self) void {
+        self.string = "";
+        self.length = 0;
+    }
+
     fn copyConstU8ToU8(allocator: *Allocator, str: []const u8) []u8 {
         var buf: []u8 = allocator.alloc(u8, str.len) catch unreachable;
         for (str, 0..) |_, i| {

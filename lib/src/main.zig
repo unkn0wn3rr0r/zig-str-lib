@@ -9,10 +9,10 @@ pub fn main() !void {
     var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     defer arena.deinit();
     var allocator = arena.allocator();
+    _ = allocator;
 
-    var str = String.new(&allocator, "debel");
-
-    print("{}\n", .{str.includes("ebe")});
+    const foundAt = std.mem.indexOf(u32, &[_]u32{ 1, 2, 3, 5 }, &[_]u32{2});
+    print("{}\n", .{foundAt.?});
 }
 
 test "capitalize" {
@@ -165,4 +165,30 @@ test "toLowerCase" {
 
     var str3 = String.new(&allocator, "A@!?./ADFOIGIOADF0101HOH0");
     try expectEqualStrings(str3.toLowerCase(), "a@!?./adfoigioadf0101hoh0");
+}
+
+test "clear" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    var allocator = arena.allocator();
+
+    var str = String.new(&allocator, "PEPESHOPE");
+    str.clear();
+    try expectEqualStrings(str.string, "");
+    try expect(str.length == 0);
+
+    var str1 = String.new(&allocator, "xXxXxX");
+    str1.clear();
+    try expectEqualStrings(str1.string, "");
+    try expect(str1.length == 0);
+
+    var str2 = String.new(&allocator, "xx");
+    str2.clear();
+    try expectEqualStrings(str2.string, "");
+    try expect(str2.length == 0);
+
+    var str3 = String.new(&allocator, "A@!?./ADFOIGIOADF0101HOH0");
+    str3.clear();
+    try expectEqualStrings(str3.string, "");
+    try expect(str3.length == 0);
 }
