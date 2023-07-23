@@ -89,7 +89,6 @@ pub const String = struct {
         if (str.len > self.length) {
             return false;
         }
-
         var i: usize = 0;
         var t: usize = 0;
         while (i < self.length) : (i += 1) {
