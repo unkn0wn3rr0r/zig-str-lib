@@ -107,21 +107,21 @@ pub const String = struct {
         return false;
     }
 
-    pub fn toUpperCase(self: *Self) []const u8 {
+    pub fn toUpperCase(self: Self) []const u8 {
         var i: usize = 0;
         while (i < self.length) : (i += 1) {
             if (self.string[i] >= 97 and self.string[i] <= 122) {
-                self.string[i] = self.string[i] - 32;
+                self.string[i] -= 32;
             }
         }
         return self.string;
     }
 
-    pub fn toLowerCase(self: *Self) []const u8 {
+    pub fn toLowerCase(self: Self) []const u8 {
         var i: usize = 0;
         while (i < self.length) : (i += 1) {
             if (self.string[i] >= 65 and self.string[i] <= 90) {
-                self.string[i] = self.string[i] + 32;
+                self.string[i] += 32;
             }
         }
         return self.string;

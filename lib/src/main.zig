@@ -108,6 +108,7 @@ test "includes" {
     try expect(str.includes("pe"));
     try expect(str.includes("ope"));
     try expect(str.includes("shop"));
+    try expect(str.includes("shope"));
     try expect(!str.includes("opep"));
 
     var str1 = String.new(&allocator, "Hello Zig!");
