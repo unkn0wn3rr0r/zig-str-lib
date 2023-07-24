@@ -1,15 +1,15 @@
 const std = @import("std");
-
 const Allocator = std.mem.Allocator;
+const print = std.debug.print;
 
 pub const String = struct {
     const Self = @This();
 
-    allocator: *Allocator,
+    allocator: Allocator,
     string: []u8,
     length: u64,
 
-    pub fn new(allocator: *Allocator, str: []const u8) Self {
+    pub fn new(allocator: Allocator, str: []const u8) Self {
         return Self{
             .allocator = allocator,
             .string = copyConstU8ToU8(allocator, str),
@@ -132,7 +132,11 @@ pub const String = struct {
         self.length = 0;
     }
 
-    fn copyConstU8ToU8(allocator: *Allocator, str: []const u8) []u8 {
+    pub fn println(self: Self) void {
+        print("{s}\n", .{self.string});
+    }
+
+    fn copyConstU8ToU8(allocator: Allocator, str: []const u8) []u8 {
         var buf: []u8 = allocator.alloc(u8, str.len) catch unreachable;
         for (str, 0..) |_, i| {
             buf[i] = str[i];
