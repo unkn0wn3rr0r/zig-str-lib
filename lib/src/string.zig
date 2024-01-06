@@ -6,14 +6,14 @@ pub const String = struct {
     const Self = @This();
 
     allocator: Allocator,
-    string: []u8,
+    buffer: []u8,
     length: u64,
 
-    pub fn new(allocator: Allocator, str: []const u8) Self {
+    pub fn init(allocator: Allocator, input_buffer: []const u8) !Self {
         return Self{
             .allocator = allocator,
-            .string = copyConstU8ToU8(allocator, str),
-            .length = str.len,
+            .buffer = try allocator.dupe(u8, input_buffer),
+            .length = input_buffer.len,
         };
     }
 
@@ -21,53 +21,53 @@ pub const String = struct {
         if (self.length < 1) {
             return "";
         }
-        if (self.string[0] >= 97 and self.string[0] <= 122) {
-            self.string[0] -= 32;
+        if (self.buffer[0] >= 97 and self.buffer[0] <= 122) {
+            self.buffer[0] -= 32;
         }
-        return self.string;
+        return self.buffer;
     }
 
-    pub fn concat(self: *Self, str: []const u8) []const u8 {
-        const newSize = self.length + str.len;
-        var newString: []u8 = self.allocator.alloc(u8, newSize) catch unreachable;
+    pub fn concat(self: *Self, input_buffer: []const u8) []const u8 {
+        const new_size = self.length + input_buffer.len;
+        var new_string: []u8 = self.allocator.alloc(u8, new_size) catch unreachable;
 
         var i: usize = 0;
         while (i < self.length) : (i += 1) {
-            newString[i] = self.string[i];
+            new_string[i] = self.buffer[i];
         }
 
         var j: usize = 0;
-        while (j < str.len) : (j += 1) {
-            newString[j + i] = str[j];
+        while (j < input_buffer.len) : (j += 1) {
+            new_string[j + i] = input_buffer[j];
         }
 
-        self.length = newSize;
-        self.string = newString;
+        self.length = new_size;
+        self.buffer = new_string;
 
-        return newString;
+        return new_string;
     }
 
-    pub fn startsWith(self: Self, str: []const u8) bool {
-        if (str.len > self.length) {
+    pub fn startsWith(self: Self, input_buffer: []const u8) bool {
+        if (input_buffer.len > self.length) {
             return false;
         }
         var i: usize = 0;
-        while (i < str.len) : (i += 1) {
-            if (str[i] != self.string[i]) {
+        while (i < input_buffer.len) : (i += 1) {
+            if (input_buffer[i] != self.buffer[i]) {
                 return false;
             }
         }
         return true;
     }
 
-    pub fn endsWith(self: Self, str: []const u8) bool {
-        if (str.len > self.length) {
+    pub fn endsWith(self: Self, input_buffer: []const u8) bool {
+        if (input_buffer.len > self.length) {
             return false;
         }
-        var i: usize = self.string.len - str.len;
+        var i: usize = self.buffer.len - input_buffer.len;
         var t: usize = 0;
-        while (i < self.string.len) : (i += 1) {
-            if (str[t] != self.string[i]) {
+        while (i < self.buffer.len) : (i += 1) {
+            if (input_buffer[t] != self.buffer[i]) {
                 return false;
             }
             t += 1;
@@ -79,27 +79,27 @@ pub const String = struct {
         var reversed: []u8 = self.allocator.alloc(u8, self.length) catch unreachable;
         var i: usize = 0;
         while (i < self.length) : (i += 1) {
-            reversed[i] = self.string[self.length - 1 - i];
+            reversed[i] = self.buffer[self.length - 1 - i];
         }
-        self.string = reversed;
+        self.buffer = reversed;
         return reversed;
     }
 
-    pub fn includes(self: Self, str: []const u8) bool {
-        if (str.len > self.length) {
+    pub fn includes(self: Self, input_buffer: []const u8) bool {
+        if (input_buffer.len > self.length) {
             return false;
         }
         var i: usize = 0;
         var t: usize = 0;
         while (i < self.length) : (i += 1) {
-            if (self.string[i] == str[t]) {
+            if (self.buffer[i] == input_buffer[t]) {
                 t += 1;
-                if (t == str.len) {
+                if (t == input_buffer.len) {
                     return true;
                 }
             } else {
                 t = 0;
-                if (self.string[i] == str[0] and i > 0) {
+                if (self.buffer[i] == input_buffer[0] and i > 0) {
                     i -= 1;
                 }
             }
@@ -110,37 +110,29 @@ pub const String = struct {
     pub fn toUpperCase(self: Self) []const u8 {
         var i: usize = 0;
         while (i < self.length) : (i += 1) {
-            if (self.string[i] >= 97 and self.string[i] <= 122) {
-                self.string[i] -= 32;
+            if (self.buffer[i] >= 97 and self.buffer[i] <= 122) {
+                self.buffer[i] -= 32;
             }
         }
-        return self.string;
+        return self.buffer;
     }
 
     pub fn toLowerCase(self: Self) []const u8 {
         var i: usize = 0;
         while (i < self.length) : (i += 1) {
-            if (self.string[i] >= 65 and self.string[i] <= 90) {
-                self.string[i] += 32;
+            if (self.buffer[i] >= 65 and self.buffer[i] <= 90) {
+                self.buffer[i] += 32;
             }
         }
-        return self.string;
+        return self.buffer;
     }
 
     pub fn clear(self: *Self) void {
-        self.string = "";
+        self.buffer = "";
         self.length = 0;
     }
 
     pub fn println(self: Self) void {
-        print("{s}\n", .{self.string});
-    }
-
-    fn copyConstU8ToU8(allocator: Allocator, str: []const u8) []u8 {
-        var buf: []u8 = allocator.alloc(u8, str.len) catch unreachable;
-        for (str, 0..) |_, i| {
-            buf[i] = str[i];
-        }
-        return buf;
+        print("{s}\n", .{self.buffer});
     }
 };
