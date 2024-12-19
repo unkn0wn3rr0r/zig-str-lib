@@ -25,7 +25,7 @@ pub fn main() !void {
     str.println();
     _ = str.concat(" another one");
     str.println();
-    _ = str.reverse();
+    str.reverse();
     str.println();
 
     print("str buffer={s}\n", .{str.buffer});
