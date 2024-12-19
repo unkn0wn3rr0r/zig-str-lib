@@ -53,3 +53,4 @@ dkms.conf
 
 /lib/zig-cache/
 /lib/zig-out/
+/lib/.zig-cache/*
