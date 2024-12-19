@@ -12,9 +12,9 @@ pub fn main() !void {
 
     var gpa = std.heap.GeneralPurposeAllocator(.{}).init;
     defer {
-        const flag = gpa.deinit();
-        if (flag == .leak) {
-            print("Leaked memory: {}\n", .{flag});
+        switch (gpa.deinit()) {
+            .ok => print("GPA freed successfully.\n", .{}),
+            .leak => print("Leaked memory.\n", .{}),
         }
     }
     const allocator = gpa.allocator();
@@ -23,7 +23,7 @@ pub fn main() !void {
     defer str.deinit();
 
     str.println();
-    //  _ = str.concat(" another one");
+    _ = str.concat(" another one");
     str.println();
     _ = str.reverse();
     str.println();
@@ -120,6 +120,10 @@ test "reverse" {
     var str2 = try String.init(allocator, "zi");
     str2.reverse();
     try expectEqualStrings(str2.buffer, "iz");
+
+    var str3 = try String.init(allocator, "abcdefg");
+    str3.reverse();
+    try expectEqualStrings(str3.buffer, "gfedcba");
 }
 
 test "includes" {

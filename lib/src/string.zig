@@ -34,22 +34,14 @@ pub const String = struct {
 
     pub fn concat(self: *Self, input_buffer: []const u8) []const u8 {
         const new_size = self.length + input_buffer.len;
-        var new_string: []u8 = self.allocator.alloc(u8, new_size) catch unreachable;
+        self.buffer = self.allocator.realloc(self.buffer, new_size) catch unreachable;
 
-        var i: usize = 0;
-        while (i < self.length) : (i += 1) {
-            new_string[i] = self.buffer[i];
+        for (input_buffer, 0..) |b, i| {
+            self.buffer[i + self.length] = b;
         }
-
-        var j: usize = 0;
-        while (j < input_buffer.len) : (j += 1) {
-            new_string[j + i] = input_buffer[j];
-        }
-
         self.length = new_size;
-        self.buffer = new_string;
 
-        return new_string;
+        return self.buffer;
     }
 
     pub fn startsWith(self: Self, input_buffer: []const u8) bool {
@@ -81,18 +73,12 @@ pub const String = struct {
     }
 
     pub fn reverse(self: Self) void {
-        var reversed: []u8 = self.allocator.alloc(u8, self.length) catch unreachable;
-        defer self.allocator.free(reversed);
-
-        var i: usize = 0;
-        while (i < self.length) : (i += 1) {
-            reversed[i] = self.buffer[self.length - 1 - i];
-        }
-
-        i = 0;
-        for (reversed) |b| {
-            self.buffer[i] = b;
-            i += 1;
+        var start: usize = 0;
+        var end: usize = self.length - 1;
+        while (start < @divFloor(self.length, 2)) {
+            self.swap(start, end);
+            start += 1;
+            end -= 1;
         }
     }
 
@@ -145,5 +131,12 @@ pub const String = struct {
 
     pub fn println(self: Self) void {
         print("{s}\n", .{self.buffer});
+    }
+
+    fn swap(self: Self, start_idx: usize, end_idx: usize) void {
+        const first = self.buffer[start_idx];
+        const last = self.buffer[end_idx];
+        self.buffer[start_idx] = last;
+        self.buffer[end_idx] = first;
     }
 };
