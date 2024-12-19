@@ -102,6 +102,8 @@ test "endsWith" {
     try expect(!str.endsWith("peshoo"));
     try expect(!str.endsWith("so"));
     try expect(!str.endsWith("cho"));
+    try expect(!str.endsWith("oo"));
+    try expect(!str.endsWith("x"));
 }
 
 test "reverse" {
