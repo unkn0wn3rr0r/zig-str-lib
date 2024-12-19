@@ -1,37 +1,56 @@
 const std = @import("std");
 const String = @import("./string.zig").String;
 
+const print = std.debug.print;
 const expect = std.testing.expect;
 const expectEqualStrings = std.testing.expectEqualStrings;
 
 pub fn main() !void {
-    var arena_instance = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-    defer arena_instance.deinit();
-    const allocator = arena_instance.allocator();
+    // var arena_instance = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    // defer arena_instance.deinit();
+    // const allocator = arena_instance.allocator();
+
+    var gpa = std.heap.GeneralPurposeAllocator(.{}).init;
+    defer {
+        const flag = gpa.deinit();
+        if (flag == .leak) {
+            print("Leaked memory: {}\n", .{flag});
+        }
+    }
+    const allocator = gpa.allocator();
 
     var str = try String.init(allocator, "asd asd asd");
+    defer str.deinit();
+
     str.println();
-    _ = str.concat(" another one");
+    //  _ = str.concat(" another one");
     str.println();
     _ = str.reverse();
     str.println();
+
+    print("str buffer={s}\n", .{str.buffer});
+    print("str length={d}\n", .{str.length});
 }
 
 test "capitalize" {
-    var arena_instance = std.heap.ArenaAllocator.init(std.testing.allocator);
-    defer arena_instance.deinit();
-    const allocator = arena_instance.allocator();
+    // var arena_instance = std.heap.ArenaAllocator.init(std.testing.allocator);
+    // defer arena_instance.deinit();
+    // const allocator = arena_instance.allocator();
 
-    const str = try String.init(allocator, "hello Zig.");
+    var str = try String.init(std.testing.allocator, "hello Zig.");
+    defer str.deinit();
     try expectEqualStrings(str.capitalize(), "Hello Zig.");
 
-    const str1 = try String.init(allocator, "a");
+    var str1 = try String.init(std.testing.allocator, "a");
+    defer str1.deinit();
     try expectEqualStrings(str1.capitalize(), "A");
 
-    const str2 = try String.init(allocator, "A");
+    var str2 = try String.init(std.testing.allocator, "A");
+    defer str2.deinit();
     try expectEqualStrings(str2.capitalize(), "A");
 
-    const str3 = try String.init(allocator, "");
+    var str3 = try String.init(std.testing.allocator, "");
+    defer str3.deinit();
     try expectEqualStrings(str3.capitalize(), "");
 }
 
@@ -91,13 +110,16 @@ test "reverse" {
     const allocator = arena_instance.allocator();
 
     var str = try String.init(allocator, "lebed");
-    try expectEqualStrings(str.reverse(), "debel");
+    str.reverse();
+    try expectEqualStrings(str.buffer, "debel");
 
     var str1 = try String.init(allocator, "Hello Zig!");
-    try expectEqualStrings(str1.reverse(), "!giZ olleH");
+    str1.reverse();
+    try expectEqualStrings(str1.buffer, "!giZ olleH");
 
     var str2 = try String.init(allocator, "zi");
-    try expectEqualStrings(str2.reverse(), "iz");
+    str2.reverse();
+    try expectEqualStrings(str2.buffer, "iz");
 }
 
 test "includes" {
@@ -169,7 +191,7 @@ test "toLowerCase" {
     try expectEqualStrings(str3.toLowerCase(), "a@!?./adfoigioadf0101hoh0");
 }
 
-test "clear" {
+test "reset" {
     var arena_instance = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena_instance.deinit();
     const allocator = arena_instance.allocator();
@@ -177,28 +199,28 @@ test "clear" {
     var str = try String.init(allocator, "PEPESHOPE");
     try expect(str.length == 9);
 
-    str.clear();
+    str.reset();
     try expectEqualStrings(str.buffer, "");
     try expect(str.length == 0);
 
     var str1 = try String.init(allocator, "xXxXxX");
     try expect(str1.length == 6);
 
-    str1.clear();
+    str1.reset();
     try expectEqualStrings(str1.buffer, "");
     try expect(str1.length == 0);
 
     var str2 = try String.init(allocator, "xx");
     try expect(str2.length == 2);
 
-    str2.clear();
+    str2.reset();
     try expectEqualStrings(str2.buffer, "");
     try expect(str2.length == 0);
 
     var str3 = try String.init(allocator, "A@!?./ADFOIGIOADF0101HOH0");
     try expect(str3.length == 25);
 
-    str3.clear();
+    str3.reset();
     try expectEqualStrings(str3.buffer, "");
     try expect(str3.length == 0);
 }

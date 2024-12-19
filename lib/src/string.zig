@@ -7,7 +7,7 @@ pub const String = struct {
 
     allocator: Allocator,
     buffer: []u8,
-    length: u64,
+    length: usize,
 
     pub fn init(allocator: Allocator, input_buffer: []const u8) !Self {
         return Self{
@@ -15,6 +15,11 @@ pub const String = struct {
             .buffer = try allocator.dupe(u8, input_buffer),
             .length = input_buffer.len,
         };
+    }
+
+    pub fn deinit(self: *Self) void {
+        self.allocator.free(self.buffer);
+        self.length = 0; // that might be pointless at this point, but anyways..
     }
 
     pub fn capitalize(self: Self) []const u8 {
@@ -75,14 +80,20 @@ pub const String = struct {
         return true;
     }
 
-    pub fn reverse(self: *Self) []const u8 {
+    pub fn reverse(self: Self) void {
         var reversed: []u8 = self.allocator.alloc(u8, self.length) catch unreachable;
+        defer self.allocator.free(reversed);
+
         var i: usize = 0;
         while (i < self.length) : (i += 1) {
             reversed[i] = self.buffer[self.length - 1 - i];
         }
-        self.buffer = reversed;
-        return reversed;
+
+        i = 0;
+        for (reversed) |b| {
+            self.buffer[i] = b;
+            i += 1;
+        }
     }
 
     pub fn includes(self: Self, input_buffer: []const u8) bool {
@@ -127,7 +138,7 @@ pub const String = struct {
         return self.buffer;
     }
 
-    pub fn clear(self: *Self) void {
+    pub fn reset(self: *Self) void {
         self.buffer = "";
         self.length = 0;
     }
