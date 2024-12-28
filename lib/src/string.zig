@@ -22,6 +22,15 @@ pub const String = struct {
         self.length = 0; // that might be pointless at this point, but anyways..
     }
 
+    pub fn equals(self: Self, other: []const u8) bool {
+        if (self.length != other.len) return false;
+        if (self.buffer.ptr == other.ptr) return true;
+        for (self.buffer, other) |char_one, char_two| {
+            if (char_one != char_two) return false;
+        }
+        return true;
+    }
+
     pub fn capitalize(self: Self) []const u8 {
         if (self.length < 1) {
             return "";
@@ -75,7 +84,8 @@ pub const String = struct {
     pub fn reverse(self: Self) void {
         var start: usize = 0;
         var end: usize = self.length - 1;
-        while (start < @divFloor(self.length, 2)) {
+        const size = @divFloor(self.length, 2);
+        while (start < size) {
             self.swap(start, end);
             start += 1;
             end -= 1;

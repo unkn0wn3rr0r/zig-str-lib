@@ -28,15 +28,39 @@ pub fn main() !void {
     str.reverse();
     str.println();
 
+    var are_eql = str.equals("eno rehtona dsa dsa dsa");
+    print("'{s}' = '{s}' -> {}\n", .{ str.buffer, "eno rehtona dsa dsa dsa", are_eql });
+
+    are_eql = str.equals("enu rehtona dsa dsa dsa");
+    print("'{s}' = '{s}' -> {}\n", .{ str.buffer, "enu rehtona dsa dsa dsa", are_eql });
+
     print("str buffer={s}\n", .{str.buffer});
     print("str length={d}\n", .{str.length});
 }
 
-test "capitalize" {
-    // var arena_instance = std.heap.ArenaAllocator.init(std.testing.allocator);
-    // defer arena_instance.deinit();
-    // const allocator = arena_instance.allocator();
+test "equals" {
+    var str = try String.init(std.testing.allocator, "hello Zig.");
+    defer str.deinit();
+    try expect(str.equals("hello Zig."));
+    try expect(!str.equals("Hello Zig."));
 
+    var str1 = try String.init(std.testing.allocator, "a");
+    defer str1.deinit();
+    try expect(str1.equals("a"));
+    try expect(!str1.equals("A"));
+
+    var str2 = try String.init(std.testing.allocator, "1 2 3");
+    defer str2.deinit();
+    try expect(str2.equals("1 2 3"));
+    try expect(!str2.equals("1  2  3"));
+
+    var str3 = try String.init(std.testing.allocator, "string^to@compare");
+    defer str3.deinit();
+    try expect(str3.equals("string^to@compare"));
+    try expect(str3.equals(str3.buffer));
+}
+
+test "capitalize" {
     var str = try String.init(std.testing.allocator, "hello Zig.");
     defer str.deinit();
     try expectEqualStrings(str.capitalize(), "Hello Zig.");
