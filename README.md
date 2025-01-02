@@ -1,2 +1,2 @@
 # zig-str-lib
-String manipulation library written in the Zig programming language for educational purposes.
+Simple and naive implementation of a string library written in the Zig programming language for educational purposes.
