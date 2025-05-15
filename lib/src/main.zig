@@ -51,7 +51,8 @@ pub fn main() !void {
     }
 
     for (list.items, 0..) |s, i| {
-        std.debug.print("{d}. {s}\n", .{ i + 1, s.buffer });
+        std.debug.print("{d}. ", .{i + 1});
+        s.println();
     }
 }
 
