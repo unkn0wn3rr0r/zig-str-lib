@@ -36,6 +36,23 @@ pub fn main() !void {
 
     print("str buffer={s}\n", .{str.buffer});
     print("str length={d}\n", .{str.length});
+
+    var list = std.ArrayList(String).init(allocator);
+    defer {
+        for (list.items) |*s| {
+            s.deinit();
+        }
+        list.deinit();
+    }
+
+    const string_arr = [_][]const u8{ "one", "two", "three", "four", "five" };
+    for (string_arr) |s| {
+        try list.append(try String.init(allocator, s));
+    }
+
+    for (list.items, 0..) |s, i| {
+        std.debug.print("{d}. {s}\n", .{ i + 1, s.buffer });
+    }
 }
 
 test "equals" {
